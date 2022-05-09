@@ -15,7 +15,7 @@ $ git clone https://github.com/Fsoky/vkmpho.git
 - Change directory and setup dependencies
 ```
 $ cd vkmpho/
-$ pip3 install -r requirements.txt
+$ pip3 install vkbottle
 ```
 - Run the script
 ```
