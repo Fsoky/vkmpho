@@ -10,7 +10,6 @@ Metadata from VK photos (beta)
 |Option|Description|
 |------|-----------|
 |-u    |User name or ID for get all photos from wall|
-|--count|Count of returns photos (default: 0)|
 
 ## Getting started
 
