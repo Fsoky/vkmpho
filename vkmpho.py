@@ -1,57 +1,38 @@
 import argparse
 import asyncio
-import io
-import time
-
-import aiohttp
-import aiofiles
-
-from PIL import Image as PILImage
-from exif import Image
 
 from vkbottle import API, VKAPIError
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-u")
-parser.add_argument("--count", type=str, default=10)
+parser.add_argument("-u", type=str)
+parser.add_argument("--count", type=int, default=0)
 options = parser.parse_args()
 
-api = API("token")
+api = API("TOKEN")
 
 
 async def handler():
-    start_count = 0
+    user_id = options.u
+    if not user_id.isdigit():
+        user_id = await api.utils.resolve_screen_name(screen_name=user_id)
+        user_id = user_id.object_id
 
     try:
-        user_id = options.u
-        if not options.u.isdigit():
-            user_id = await api.utils.resolve_screen_name(screen_name=options.u)
-            user_id = user_id.object_id
-
         photos = await api.photos.get_all(owner_id=user_id)
-        print(f"Count: {photos.count}")
 
+        counter = 0
         for photo in photos.items:
-            if start_count == options.count:
-                break
+            if options.count > 0:
+                if counter == options.count:
+                    break
 
-            async with aiohttp.ClientSession() as session:
-                async with session.get(photo.sizes[0].url) as response:
-                    photo_bytes = await aiohttp.StreamReader.read(response.content)
-                    filename = time.time()
-
-                    img = PILImage.open(io.BytesIO(photo_bytes))
-                    img.save(f"./spho/{filename}.jpg")
-
-                    async with aiofiles.open(f"./spho/{filename}.jpg", mode="rb") as file:
-                        content_of_photo = Image(await file.read())
-
-                        if content_of_photo.has_exif:
-                            print(f"[+] {filename}.jpg has exif")
-
-                    start_count += 1
+                if (photo.lat and photo.long) is not None:
+                    print(f"Latitude: {photo.lat}\nLongitude: {photo.long}\nURL: {photo.sizes[9].url}\n")
+            counter += 1
     except VKAPIError[19]:
-        print("Access error.")
+        print("Content is blocked")
+    except VKAPIError[30]:
+        print("Profile is private")
 
 
 asyncio.run(handler())
