@@ -21,3 +21,10 @@ $ pip3 install -r requirements.txt
 ```
 $ python3 vkmpho.py -u USER_NAME_OR_ID --count 12
 ```
+
+If photo has some geo data, script returns info about it:
+```bash
+Latitude: 123.0000
+Longitude: 456.0000
+URL: https://vk.com/userapi.....
+```
