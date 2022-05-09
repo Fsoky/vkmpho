@@ -6,6 +6,12 @@ Metadata from VK photos (beta)
 ![VkBottle](https://img.shields.io/badge/VkBottle-4.0-pink?style=for-the-badge&logo=vk)
 ![Asyncio](https://img.shields.io/badge/Asyncio-red?style=for-the-badge)
 
+### Options
+|Option|Description|
+|------|-----------|
+|-u    |User name or ID for get all photos from wall|
+|--count|Count of returns photos (default: 0)|
+
 ## Getting started
 
 - Download repository from GitHub
@@ -17,6 +23,12 @@ $ git clone https://github.com/Fsoky/vkmpho.git
 $ cd vkmpho/
 $ pip3 install vkbottle
 ```
+- Get access token for your account ([you can do it here](https://vkhost.github.io/))
+- Open file in editor and replace word *TOKEN* to your access token
+```py
+api = API("TOKEN")
+```
+
 - Run the script
 ```
 $ python3 vkmpho.py -u USER_NAME_OR_ID --count 12
