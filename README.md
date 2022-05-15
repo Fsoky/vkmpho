@@ -39,6 +39,7 @@ $ python3 vkmpho.py -u some_user_ids.txt
 
 If photo has some geo data, script returns info about it:
 ```bash
+ID: https://vk.com/id000000
 Latitude: 123.0000
 Longitude: 456.0000
 URL: https://vk.com/userapi.....
