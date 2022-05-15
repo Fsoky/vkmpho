@@ -32,6 +32,10 @@ api = API("TOKEN")
 ```
 $ python3 vkmpho.py -u USER_NAME_OR_ID --count 12
 ```
+*Also you can pass the TXT file with IDs*
+```
+$ python3 vkmpho.py -u some_user_ids.txt
+```
 
 If photo has some geo data, script returns info about it:
 ```bash
