@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import os
 
 from vkbottle import API, VKAPIError
 
@@ -11,28 +12,54 @@ options = parser.parse_args()
 api = API("TOKEN")
 
 
-async def handler():
-    user_id = options.u
+async def get_user_id(user_id=None):
+    if user_id is None:
+        user_id = options.u
+
     if not user_id.isdigit():
-        user_id = await api.utils.resolve_screen_name(screen_name=user_id)
-        user_id = user_id.object_id
+        if not os.path.exists(user_id):
+            user_id = await api.utils.resolve_screen_name(screen_name=user_id)
+            user_id = user_id.object_id
+        else:
+            with open(user_id, "r", encoding="utf-8") as file:
+                user_id = file.readlines()
+
+    return user_id
+
+
+async def get_photos_from_user():
+    user_id = await get_user_id()
 
     try:
-        photos = await api.photos.get_all(owner_id=user_id)
+        if not isinstance(user_id, list):
+            photos = [await api.photos.get_all(owner_id=user_id)]
+        else:
+            photos = []
+            for uid in user_id:
+                clear_uid = await get_user_id(uid.replace("\n", ""))
+                photos.append(await api.photos.get_all(owner_id=clear_uid))
 
-        counter = 0
-        for photo in photos.items:
-            if options.count > 0:
-                if counter == options.count:
-                    break
-
-                if (photo.lat and photo.long) is not None:
-                    print(f"Latitude: {photo.lat}\nLongitude: {photo.long}\nURL: {photo.sizes[9].url}\n")
-            counter += 1
+        return photos
     except VKAPIError[19]:
         print("Content is blocked")
     except VKAPIError[30]:
         print("Profile is private")
+
+
+async def handler():
+    photos = await get_photos_from_user()
+    counter = 0
+
+    for photo_item in photos:
+        for photo in photo_item.items:
+            if options.count > 0:
+                if counter == options.count:
+                    break
+
+            if (photo.lat and photo.long) is not None:
+                print(f"ID: https://vk.com/id{photo.owner_id}\nLatitude: {photo.lat}\nLongitude: {photo.long}\nURL: {photo.sizes[9].url}\n")
+
+            counter += 1
 
 
 asyncio.run(handler())
